@@ -1,0 +1,75 @@
+---
+title: "Wild Data"
+author: "Michelle Lam"
+format: html
+editor: visual
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+```{r}
+mack_verts <- read_csv(here::here("data",
+                                  "AS00601.csv")) %>% 
+  clean_names()
+```
+
+```{r}
+mc_wt_5 <- mack_verts$weight[5]
+mc_wt_5
+
+mc_length_8_20 <- mack_verts$length1[8:20]
+mc_length_8_20
+
+mc_dates <- mack_verts$sampledate
+mc_dates
+```
+
+Create subset of mack_verts data for salamanders.
+
+```{r}
+mc_salamanders <- mack_verts %>% filter(species == "DITE")
+```
+
+```{r}
+mc_salamanders_plot <- ggplot(data = mc_salamanders,
+       aes(x = length1, y = weight)) +
+  geom_point(color = "violetred3", alpha = 0.7) +
+  labs(x = "Snout-Vent Length (mm)", y = "Weight (g)", title = "Salamander Length vs. Weight", subtitle = "Pacific Giant Salamander", caption = "https://portal.edirepository.org/nis/mapbrowse?packageid=knb-lter-and.4027.14")
+```
+
+```{r}
+ggsave(plot = mc_salamanders_plot,
+       here("figs",
+            "salamander_size.png"))
+```
+
+Make subset of mack_verts data for cutthroat trout
+
+```{r}
+mc_trout <- mack_verts %>% filter(species == "ONCL")
+```
+
+```{r}
+mc_trout_plot <- ggplot(data = mc_trout,
+       aes(x = length1, y = weight)) +
+  geom_point(aes(color = reach, alpha = 0.5)) +
+  facet_wrap(~reach) +
+  theme_minimal() +
+  scale_color_manual(values = c("darkorchid", "goldenrod", "seagreen4")) +
+  labs(x = "Snout-Vent Length (mm)", y = "Weight (g)", title = "Trout Length vs. Weight", subtitle = "Cutthroat Trout", caption = "https://portal.edirepository.org/nis/mapbrowse?packageid=knb-lter-and.4027.14")
+
+mc_trout_plot
+```
+
+```{r}
+ggsave(plot = mc_trout_plot,
+       here("figs",
+            "cutthroat_size.png"))
+```
